@@ -10,8 +10,7 @@
             android:name=".PicRouterConnectService"
             android:process=":pic" />
         <activity
-            android:name=".PicActivity"
-            android:process=":pic"/>
+            android:name=".PicActivity" />
     </application>
 
 </manifest>

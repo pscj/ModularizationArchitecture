@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.main_wide_shutdown_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LocalRouter.getInstance(MaApplication.getMaApplication()).stopWideRouter();
+                //LocalRouter.getInstance(MaApplication.getMaApplication()).stopWideRouter();
             }
         });
         findViewById(R.id.main_pic_btn).setOnClickListener(new View.OnClickListener() {
@@ -203,7 +203,6 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     final RouterResponse response = LocalRouter.getInstance(MaApplication.getMaApplication())
                             .route(MainActivity.this, RouterRequest.obtain(MainActivity.this)
-                                    .domain("com.spinytech.maindemo:pic")
                                     .provider("pic")
                                     .action("pic")
                                     .data("is_big", "0"));
@@ -242,7 +241,6 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     final RouterResponse response = LocalRouter.getInstance(MaApplication.getMaApplication())
                             .route(MainActivity.this, RouterRequest.obtain(MainActivity.this)
-                                    .domain("com.spinytech.maindemo:pic")
                                     .provider("pic")
                                     .action("pic")
                                     .data("is_big", "1"));

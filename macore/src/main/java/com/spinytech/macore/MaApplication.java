@@ -9,9 +9,6 @@ import android.support.annotation.NonNull;
 import com.spinytech.macore.multiprocess.BaseApplicationLogic;
 import com.spinytech.macore.multiprocess.PriorityLogicWrapper;
 import com.spinytech.macore.router.LocalRouter;
-import com.spinytech.macore.router.WideRouter;
-import com.spinytech.macore.router.WideRouterApplicationLogic;
-import com.spinytech.macore.router.WideRouterConnectService;
 import com.spinytech.macore.tools.Logger;
 import com.spinytech.macore.tools.ProcessUtil;
 
@@ -36,7 +33,7 @@ public abstract class MaApplication extends Application {
         sInstance = this;
         Logger.d(TAG,"Application onCreate start: "+System.currentTimeMillis());
         init();
-        startWideRouter();
+        //startWideRouter();
         initializeLogic();
         dispatchLogic();
         instantiateLogic();
@@ -57,13 +54,13 @@ public abstract class MaApplication extends Application {
         mLogicClassMap = new HashMap<>();
     }
 
-    protected void startWideRouter() {
-        if (needMultipleProcess()) {
-            registerApplicationLogic(WideRouter.PROCESS_NAME, 1000, WideRouterApplicationLogic.class);
-            Intent intent = new Intent(this, WideRouterConnectService.class);
-            startService(intent);
-        }
-    }
+//    protected void startWideRouter() {
+//        if (needMultipleProcess()) {
+//            registerApplicationLogic(WideRouter.PROCESS_NAME, 1000, WideRouterApplicationLogic.class);
+//            Intent intent = new Intent(this, WideRouterConnectService.class);
+//            startService(intent);
+//        }
+//    }
 
     public abstract void initializeAllProcessRouter();
 
