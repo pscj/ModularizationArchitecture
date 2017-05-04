@@ -10,12 +10,12 @@ import com.spinytech.webdemo.WebApplicationLogic;
  */
 
 public class MyApplication extends MaApplication {
-    @Override
-    public void initializeAllProcessRouter() {
+    //@Override
+//    public void initializeAllProcessRouter() {
 //        WideRouter.registerLocalRouter("com.spinytech.maindemo",MainRouterConnectService.class);
 //        WideRouter.registerLocalRouter("com.spinytech.maindemo:music",MusicRouterConnectService.class);
 //        WideRouter.registerLocalRouter("com.spinytech.maindemo:pic",PicRouterConnectService.class);
-    }
+//    }
 
     @Override
     protected void initializeLogic() {
@@ -25,8 +25,8 @@ public class MyApplication extends MaApplication {
         registerApplicationLogic("com.spinytech.maindemo",999, PicApplicationLogic.class);
     }
 
-    @Override
-    public boolean needMultipleProcess() {
-        return false;
-    }
+//    @Override
+//    public boolean needMultipleProcess() {
+//        return false;
+//    }
 }

@@ -12,13 +12,15 @@ public abstract class MaProvider{
     private HashMap<String,MaAction> mActions;
     public MaProvider(){
         mActions = new HashMap<>();
-        registerActions();
     }
     protected void registerAction(String actionName,MaAction action){
         mActions.put(actionName,action);
     }
 
     public MaAction findAction(String actionName){
+        if(mActions.size() == 0){
+            registerActions();
+        }
         return mActions.get(actionName);
     }
 

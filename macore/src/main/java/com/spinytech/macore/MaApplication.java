@@ -62,11 +62,11 @@ public abstract class MaApplication extends Application {
 //        }
 //    }
 
-    public abstract void initializeAllProcessRouter();
+    //public abstract void initializeAllProcessRouter();
 
     protected abstract void initializeLogic();
 
-    public abstract boolean needMultipleProcess();
+    //public abstract boolean needMultipleProcess();
 
     protected boolean registerApplicationLogic(String processName, int priority, @NonNull Class<? extends BaseApplicationLogic> logicClass) {
         boolean result = false;
