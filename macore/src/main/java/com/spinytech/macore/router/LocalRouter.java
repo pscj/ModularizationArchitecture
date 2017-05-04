@@ -1,16 +1,13 @@
 package com.spinytech.macore.router;
 
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.IBinder;
-import android.os.RemoteException;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 
 import com.spinytech.macore.ErrorAction;
 import com.spinytech.macore.MaAction;
-import com.spinytech.macore.MaActionResult;
 import com.spinytech.macore.MaApplication;
 import com.spinytech.macore.MaProvider;
 import com.spinytech.macore.tools.Logger;
@@ -20,8 +17,6 @@ import java.util.HashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import static android.content.Context.BIND_AUTO_CREATE;
 
 /**
  * The Local Router
@@ -60,40 +55,52 @@ public class LocalRouter {
         mProviders.put(providerName, provider);
     }
 
-    public RouterResponse route(Context context, @NonNull RouterRequest routerRequest) throws Exception {
+    public void route(Context context, @NonNull RouterRequest routerRequest){
+        route(context, routerRequest, null);
+    }
+
+    public void route(Context context, @NonNull RouterRequest routerRequest, ResponseCallback callback){
         Logger.d(TAG, "Process:" + mProcessName + "\nLocal route start: " + System.currentTimeMillis());
-        RouterResponse routerResponse = new RouterResponse();
+        //RouterResponse routerResponse = new RouterResponse();
         // Local request
         if (mProcessName.equals(routerRequest.getDomain())) {
-            HashMap<String, String> params = new HashMap<>();
-            Object attachment = routerRequest.getAndClearObject();
+            Bundle params = new Bundle();
             params.putAll(routerRequest.getData());
             Logger.d(TAG, "Process:" + mProcessName + "\nLocal find action start: " + System.currentTimeMillis());
             MaAction targetAction = findRequestAction(routerRequest);
             routerRequest.isIdle.set(true);
             Logger.d(TAG, "Process:" + mProcessName + "\nLocal find action end: " + System.currentTimeMillis());
-            routerResponse.mIsAsync = attachment == null ? targetAction.isAsync(context, params) : targetAction.isAsync(context, params, attachment);
-            // Sync result, return the result immediately.
-            if (!routerResponse.mIsAsync) {
-                MaActionResult result = attachment == null ? targetAction.invoke(context, params) : targetAction.invoke(context, params, attachment);
-                routerResponse.mResultString = result.toString();
-                routerResponse.mObject = result.getObject();
-                Logger.d(TAG, "Process:" + mProcessName + "\nLocal sync end: " + System.currentTimeMillis());
+            boolean isAsync = targetAction.isAsync(context, params);
+
+            if(isAsync){
+                LocalTask task = new LocalTask(params, context, targetAction, callback);
+                getThreadPool().submit(task);
+            }else{
+                if (callback == null){
+                    callback = new ResponseCallback() {
+                        @Override
+                        public void onInvoke(Bundle requestData, RouterResponse response) {
+                            Logger.d(TAG, "Process:" + mProcessName + "\nonInvoke without callback" + System.currentTimeMillis());
+                        }
+                    };
+                }
+                targetAction.invoke(context, params, callback);
             }
-            // Async result, use the thread pool to execute the task.
-            else {
-                LocalTask task = new LocalTask(routerResponse, params,attachment, context, targetAction);
-                routerResponse.mAsyncResponse = getThreadPool().submit(task);
-            }
-        } else if (!mApplication.needMultipleProcess()) {
-            throw new Exception("Please make sure the returned value of needMultipleProcess in MaApplication is true, so that you can invoke other process action.");
+            //RouterResponse result = attachment == null ? targetAction.invoke(context, params) : targetAction.invoke(context, params, attachment);
+            //routerResponse.mResultString = result.toString();
+            //routerResponse.mObject = result.getObject();
+            Logger.d(TAG, "Process:" + mProcessName + "\nLocal sync end: " + System.currentTimeMillis());
+//            // Async result, use the thread pool to execute the task.
+//            else {
+//                LocalTask task = new LocalTask(routerResponse, params,attachment, context, targetAction);
+//                routerResponse.mAsyncResponse = getThreadPool().submit(task);
+//            }
         }
-        return routerResponse;
     }
 
     private MaAction findRequestAction(RouterRequest routerRequest) {
         MaProvider targetProvider = mProviders.get(routerRequest.getProvider());
-        ErrorAction defaultNotFoundAction = new ErrorAction(false, MaActionResult.CODE_NOT_FOUND, "Not found the action.");
+        ErrorAction defaultNotFoundAction = new ErrorAction(false, RouterResponse.CODE_NOT_FOUND, "Not found the action.");
         if (null == targetProvider) {
             return defaultNotFoundAction;
         } else {
@@ -107,28 +114,41 @@ public class LocalRouter {
     }
 
     private class LocalTask implements Callable<String> {
-        private RouterResponse mResponse;
-        private HashMap<String, String> mRequestData;
+        private Bundle mRequestData;
         private Context mContext;
         private MaAction mAction;
-        private Object mObject;
+        private ResponseCallback callback;
+        private ResponseCallback innnerCallback;
+        private Handler handler;
 
-        public LocalTask(RouterResponse routerResponse, HashMap<String, String> requestData,Object object, Context context, MaAction maAction) {
+        public LocalTask(Bundle requestData, Context context, MaAction maAction, final ResponseCallback callback) {
             this.mContext = context;
-            this.mResponse = routerResponse;
             this.mRequestData = requestData;
             this.mAction = maAction;
-            this.mObject = object;
+            this.callback = callback;
+            handler = new Handler(Looper.myLooper());
+
+            innnerCallback = new ResponseCallback() {
+                @Override
+                public void onInvoke(final Bundle requestData, final RouterResponse response) {
+                    if( callback != null){
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                callback.onInvoke(requestData,response);
+                            }
+                        });
+                    }
+
+                }
+            };
         }
 
         @Override
         public String call() throws Exception {
-            MaActionResult result = mObject == null ?
-                    mAction.invoke(mContext, mRequestData) :
-                    mAction.invoke(mContext, mRequestData, mObject);
-            mResponse.mObject = result.getObject();
+            mAction.invoke(mContext, mRequestData, innnerCallback);
             Logger.d(TAG, "Process:" + mProcessName + "\nLocal async end: " + System.currentTimeMillis());
-            return result.toString();
+            return "";
         }
     }
 

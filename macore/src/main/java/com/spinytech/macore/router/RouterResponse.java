@@ -1,103 +1,105 @@
 package com.spinytech.macore.router;
 
+
+import android.os.Bundle;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
 /**
- * Created by wanglei on 2016/12/27.
+ * Created by wanglei on 16/6/14.
  */
-
 public class RouterResponse {
+    public static final int CODE_SUCCESS = 0x0000;
+    public static final int CODE_ERROR = 0x0001;
+    public static final int CODE_NOT_FOUND = 0X0002;
+    public static final int CODE_INVALID = 0X0003;
+    public static final int CODE_ROUTER_NOT_REGISTER = 0X0004;
+    public static final int CODE_CANNOT_BIND_LOCAL = 0X0005;
+    public static final int CODE_REMOTE_EXCEPTION = 0X0006;
+    public static final int CODE_CANNOT_BIND_WIDE = 0X0007;
+    public static final int CODE_TARGET_IS_WIDE = 0X0008;
+    public static final int CODE_WIDE_STOPPING = 0X0009;
+    public static final int CODE_NOT_IMPLEMENT = 0X000a;
 
-    private static final int TIME_OUT = 30 * 1000;
+    private int code;
+    private String msg;
+    private Bundle data;
 
-    private long mTimeOut = 0;
-    private boolean mHasGet = false;
-    boolean mIsAsync = true;
-
-    int mCode = -1;
-
-    String mMessage = "";
-
-    String mData;
-
-    Object mObject;
-
-    /**
-     *  This field is MaActionResult.toString()
-     */
-    String mResultString;
-
-    Future<String> mAsyncResponse;
-
-    public RouterResponse() {
-        this(TIME_OUT);
+    private RouterResponse(Builder builder) {
+        this.code = builder.mCode;
+        this.msg = builder.mMsg;
+        this.data = builder.mData;
     }
 
-    public RouterResponse(long timeout) {
-        if (timeout > TIME_OUT * 2 || timeout < 0) {
-            timeout = TIME_OUT;
+
+    public Bundle getData() {
+        return data;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+//    @Override
+//    public String toString() {
+//        JSONObject jsonObject = new JSONObject();
+//        try {
+//            jsonObject.put("code", code);
+//            jsonObject.put("msg", msg);
+//            jsonObject.put("data", data);
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//        return jsonObject.toString();
+//    }
+
+    public static class Builder {
+        private int mCode;
+        private String mMsg;
+        private Bundle mData;
+
+        public Builder() {
+            mCode = CODE_ERROR;
+            mMsg = "";
+            mData = null;
         }
-        mTimeOut = timeout;
-    }
 
-    public boolean isAsync() {
-        return mIsAsync;
-    }
+//        public Builder resultString(String resultString) {
+//            try {
+//                JSONObject jsonObject = new JSONObject(resultString);
+//                this.mCode = jsonObject.getInt("code");
+//                this.mMsg = jsonObject.getString("msg");
+//                this.mData = jsonObject.getString("data");
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//            return this;
+//        }
 
-    public String get() throws Exception {
-        if (mIsAsync) {
-            mResultString = mAsyncResponse.get(mTimeOut, TimeUnit.MILLISECONDS);
-            parseResult();
-        }else{
-            parseResult();
+        public Builder code(int code) {
+            this.mCode = code;
+            return this;
         }
-        return mResultString;
-    }
 
-    private void parseResult(){
-        if (!mHasGet) {
-            try {
-                JSONObject jsonObject = new JSONObject(mResultString);
-                this.mCode = jsonObject.getInt("code");
-                this.mMessage = jsonObject.getString("msg");
-                this.mData = jsonObject.getString("data");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            mHasGet = true;
+        public Builder msg(String msg) {
+            this.mMsg = msg;
+            return this;
+        }
+
+        public Builder data(Bundle data) {
+            this.mData = data;
+            return this;
+        }
+
+        public RouterResponse build() {
+            return new RouterResponse(this);
         }
     }
 
-    public int getCode() throws Exception {
-        if (!mHasGet) {
-            get();
-        }
-        return mCode;
-    }
-
-    public String getMessage() throws Exception {
-        if (!mHasGet) {
-            get();
-        }
-        return mMessage;
-    }
-
-    public String getData() throws Exception {
-        if (!mHasGet) {
-            get();
-        }
-        return mData;
-    }
-
-    public Object getObject() throws Exception {
-        if (!mHasGet) {
-            get();
-        }
-        return mObject;
-    }
 
 }

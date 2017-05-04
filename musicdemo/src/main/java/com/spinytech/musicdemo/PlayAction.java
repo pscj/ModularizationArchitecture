@@ -2,9 +2,11 @@ package com.spinytech.musicdemo;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 
 import com.spinytech.macore.MaAction;
-import com.spinytech.macore.MaActionResult;
+import com.spinytech.macore.router.ResponseCallback;
+import com.spinytech.macore.router.RouterResponse;
 
 import java.util.HashMap;
 
@@ -15,21 +17,19 @@ import java.util.HashMap;
 public class PlayAction extends MaAction {
 
     @Override
-    public boolean isAsync(Context context, HashMap<String, String> requestData) {
+    public boolean isAsync(Context context, Bundle requestData) {
         return false;
     }
 
     @Override
-    public MaActionResult invoke(Context context, HashMap<String, String> requestData) {
+    public void invoke(Context context, Bundle requestData, ResponseCallback callback) {
         Intent intent = new Intent(context,MusicService.class);
         intent.putExtra("command","play");
         context.startService(intent);
-        MaActionResult result = new MaActionResult.Builder()
-                .code(MaActionResult.CODE_SUCCESS)
+        RouterResponse result = new RouterResponse.Builder()
+                .code(RouterResponse.CODE_SUCCESS)
                 .msg("play success")
-                .data("")
-                .object(null)
                 .build();
-        return result;
+        callback.onInvoke(requestData, result);
     }
 }

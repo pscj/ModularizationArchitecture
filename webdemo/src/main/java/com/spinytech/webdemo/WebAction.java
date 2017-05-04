@@ -3,9 +3,11 @@ package com.spinytech.webdemo;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 
 import com.spinytech.macore.MaAction;
-import com.spinytech.macore.MaActionResult;
+import com.spinytech.macore.router.ResponseCallback;
+import com.spinytech.macore.router.RouterResponse;
 
 import java.util.HashMap;
 
@@ -14,13 +16,14 @@ import java.util.HashMap;
  */
 
 public class WebAction extends MaAction {
+
     @Override
-    public boolean isAsync(Context context, HashMap<String, String> requestData) {
+    public boolean isAsync(Context context, Bundle requestData) {
         return false;
     }
 
     @Override
-    public MaActionResult invoke(Context context, HashMap<String, String> requestData) {
+    public void invoke(Context context, Bundle requestData, ResponseCallback callback) {
         if(context instanceof Activity){
             Intent i = new Intent(context, WebActivity.class);
             context.startActivity(i);
@@ -29,6 +32,6 @@ public class WebAction extends MaAction {
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(i);
         }
-        return new MaActionResult.Builder().code(MaActionResult.CODE_SUCCESS).msg("success").data("").build();
+        callback.onInvoke(requestData, new RouterResponse.Builder().code(RouterResponse.CODE_SUCCESS).msg("success").build());
     }
 }

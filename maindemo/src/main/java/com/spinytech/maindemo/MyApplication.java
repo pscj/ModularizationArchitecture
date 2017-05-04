@@ -27,6 +27,6 @@ public class MyApplication extends MaApplication {
 
     @Override
     public boolean needMultipleProcess() {
-        return true;
+        return false;
     }
 }

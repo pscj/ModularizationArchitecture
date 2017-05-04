@@ -1,6 +1,7 @@
 package com.spinytech.macore.router;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.spinytech.macore.tools.Logger;
@@ -28,8 +29,7 @@ public class RouterRequest {
     private String domain;
     private String provider;
     private String action;
-    private HashMap<String, String> data;
-    private Object object;
+    private Bundle data;
     AtomicBoolean isIdle = new AtomicBoolean(true);
 
     private static final int length = 64;
@@ -48,7 +48,7 @@ public class RouterRequest {
         this.domain = DEFAULT_PROCESS;
         this.provider = "";
         this.action = "";
-        this.data = new HashMap<>();
+        this.data = new Bundle();
     }
 
 
@@ -57,7 +57,7 @@ public class RouterRequest {
         this.domain = getProcess(context);
         this.provider = "";
         this.action = "";
-        this.data = new HashMap<>();
+        this.data = new Bundle();
     }
 
     private RouterRequest(Builder builder) {
@@ -84,14 +84,8 @@ public class RouterRequest {
         return action;
     }
 
-    public HashMap<String, String> getData() {
+    public Bundle getData() {
         return data;
-    }
-
-    public Object getAndClearObject() {
-        Object temp = object;
-        object = null;
-        return temp;
     }
 
     private static String getProcess(Context context) {
@@ -101,60 +95,60 @@ public class RouterRequest {
         return DEFAULT_PROCESS;
     }
 
-    @Override
-    public String toString() {
-        //Here remove Gson to save about 10ms.
-        //String result = new Gson().toJson(this);
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("from", from);
-            jsonObject.put("domain", domain);
-            jsonObject.put("provider", provider);
-            jsonObject.put("action", action);
+//    @Override
+//    public String toString() {
+//        //Here remove Gson to save about 10ms.
+//        //String result = new Gson().toJson(this);
+//        JSONObject jsonObject = new JSONObject();
+//        try {
+//            jsonObject.put("from", from);
+//            jsonObject.put("domain", domain);
+//            jsonObject.put("provider", provider);
+//            jsonObject.put("action", action);
+//
+//            try {
+//                JSONObject jsonData = new JSONObject();
+//                for (Map.Entry<String, String> entry : data.entrySet()) {
+//                    jsonData.put(entry.getKey(), entry.getValue());
+//                }
+//                jsonObject.put("data", jsonData);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                jsonObject.put("data", "{}");
+//            }
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return jsonObject.toString();
+//    }
 
-            try {
-                JSONObject jsonData = new JSONObject();
-                for (Map.Entry<String, String> entry : data.entrySet()) {
-                    jsonData.put(entry.getKey(), entry.getValue());
-                }
-                jsonObject.put("data", jsonData);
-            } catch (Exception e) {
-                e.printStackTrace();
-                jsonObject.put("data", "{}");
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return jsonObject.toString();
-    }
-
-    public RouterRequest json(String requestJsonString) {
-        //Here remove Gson to save about 10ms.
-        //RouterRequest routerRequest = new Gson().fromJson(requestJsonString, RouterRequest.class);
-        try {
-            JSONObject jsonObject = new JSONObject(requestJsonString);
-            this.from = jsonObject.getString("from");
-            this.domain = jsonObject.getString("domain");
-            this.provider = jsonObject.getString("provider");
-            this.action = jsonObject.getString("action");
-            try {
-                JSONObject jsonData = new JSONObject(jsonObject.getString("data"));
-                Iterator it = jsonData.keys();
-                while (it.hasNext()) {
-                    String key = String.valueOf(it.next());
-                    String value = (String) jsonData.get(key);
-                    this.data.put(key, value);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                this.data = new HashMap<>();
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return this;
-    }
+//    public RouterRequest json(String requestJsonString) {
+//        //Here remove Gson to save about 10ms.
+//        //RouterRequest routerRequest = new Gson().fromJson(requestJsonString, RouterRequest.class);
+//        try {
+//            JSONObject jsonObject = new JSONObject(requestJsonString);
+//            this.from = jsonObject.getString("from");
+//            this.domain = jsonObject.getString("domain");
+//            this.provider = jsonObject.getString("provider");
+//            this.action = jsonObject.getString("action");
+//            try {
+//                JSONObject jsonData = new JSONObject(jsonObject.getString("data"));
+//                Iterator it = jsonData.keys();
+//                while (it.hasNext()) {
+//                    String key = String.valueOf(it.next());
+//                    String value = (String) jsonData.get(key);
+//                    this.data.put(key, value);
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                this.data = new HashMap<>();
+//            }
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//        return this;
+//    }
 
     public RouterRequest url(String url) {
         int questIndex = url.indexOf('?');
@@ -195,7 +189,7 @@ public class RouterRequest {
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
-                    data.put(key, value);
+                    data.putString(key, value);
                 } while (ampersandIndex > 0);
             }
         }
@@ -220,13 +214,8 @@ public class RouterRequest {
     }
 
 
-    public RouterRequest data(String key, String data) {
-        this.data.put(key, data);
-        return this;
-    }
-
-    public RouterRequest object(Object object) {
-        this.object = object;
+    public RouterRequest data(Bundle data) {
+        this.data = data;
         return this;
     }
 
@@ -270,42 +259,42 @@ public class RouterRequest {
         private String mDomain;
         private String mProvider;
         private String mAction;
-        private HashMap<String, String> mData;
+        private Bundle mData;
 
         public Builder(Context context) {
             mFrom = getProcess(context);
             mDomain = getProcess(context);
             mProvider = "";
             mAction = "";
-            mData = new HashMap<>();
+            mData = new Bundle();
         }
 
-        public Builder json(String requestJsonString) {
-            //Here remove Gson to save about 10ms.
-            //RouterRequest routerRequest = new Gson().fromJson(requestJsonString, RouterRequest.class);
-            try {
-                JSONObject jsonObject = new JSONObject(requestJsonString);
-                this.mFrom = jsonObject.getString("from");
-                this.mDomain = jsonObject.getString("domain");
-                this.mProvider = jsonObject.getString("provider");
-                this.mAction = jsonObject.getString("action");
-                try {
-                    JSONObject jsonData = new JSONObject(jsonObject.getString("data"));
-                    Iterator it = jsonData.keys();
-                    while (it.hasNext()) {
-                        String key = String.valueOf(it.next());
-                        String value = (String) jsonData.get(key);
-                        this.mData.put(key, value);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    this.mData = new HashMap<>();
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return this;
-        }
+//        public Builder json(String requestJsonString) {
+//            //Here remove Gson to save about 10ms.
+//            //RouterRequest routerRequest = new Gson().fromJson(requestJsonString, RouterRequest.class);
+//            try {
+//                JSONObject jsonObject = new JSONObject(requestJsonString);
+//                this.mFrom = jsonObject.getString("from");
+//                this.mDomain = jsonObject.getString("domain");
+//                this.mProvider = jsonObject.getString("provider");
+//                this.mAction = jsonObject.getString("action");
+//                try {
+//                    JSONObject jsonData = new JSONObject(jsonObject.getString("data"));
+//                    Iterator it = jsonData.keys();
+//                    while (it.hasNext()) {
+//                        String key = String.valueOf(it.next());
+//                        String value = (String) jsonData.get(key);
+//                        this.mData.put(key, value);
+//                    }
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                    this.mData = new HashMap<>();
+//                }
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//            return this;
+//        }
 
         public Builder url(String url) {
             int questIndex = url.indexOf('?');
@@ -346,7 +335,7 @@ public class RouterRequest {
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();
                         }
-                        mData.put(key, value);
+                        mData.putString(key, value);
                     } while (ampersandIndex > 0);
                 }
             }
@@ -371,8 +360,8 @@ public class RouterRequest {
         }
 
 
-        public Builder data(String key, String data) {
-            this.mData.put(key, data);
+        public Builder data(Bundle data) {
+            this.mData = data;
             return this;
         }
 

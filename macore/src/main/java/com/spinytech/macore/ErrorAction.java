@@ -1,6 +1,10 @@
 package com.spinytech.macore;
 
 import android.content.Context;
+import android.os.Bundle;
+
+import com.spinytech.macore.router.ResponseCallback;
+import com.spinytech.macore.router.RouterResponse;
 
 import java.util.HashMap;
 
@@ -14,8 +18,9 @@ public class ErrorAction extends MaAction {
     private int mCode;
     private String mMessage;
     private boolean mAsync;
+
     public ErrorAction() {
-        mCode = MaActionResult.CODE_ERROR;
+        mCode = RouterResponse.CODE_ERROR;
         mMessage = DEFAULT_MESSAGE;
         mAsync = false;
     }
@@ -27,19 +32,16 @@ public class ErrorAction extends MaAction {
     }
 
     @Override
-    public boolean isAsync(Context context, HashMap<String, String> requestData) {
+    public boolean isAsync(Context context, Bundle requestData) {
         return mAsync;
     }
 
     @Override
-    public MaActionResult invoke(Context context, HashMap<String, String> requestData) {
-        MaActionResult result = new MaActionResult.Builder()
+    public void invoke(Context context, Bundle requestData, ResponseCallback callback) {
+        RouterResponse result = new RouterResponse.Builder()
                 .code(mCode)
                 .msg(mMessage)
-                .data(null)
-                .object(null)
                 .build();
-        return result;
+        callback.onInvoke(requestData, result);
     }
-
 }
