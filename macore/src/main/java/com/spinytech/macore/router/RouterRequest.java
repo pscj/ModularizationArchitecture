@@ -95,107 +95,6 @@ public class RouterRequest {
         return DEFAULT_PROCESS;
     }
 
-//    @Override
-//    public String toString() {
-//        //Here remove Gson to save about 10ms.
-//        //String result = new Gson().toJson(this);
-//        JSONObject jsonObject = new JSONObject();
-//        try {
-//            jsonObject.put("from", from);
-//            jsonObject.put("domain", domain);
-//            jsonObject.put("provider", provider);
-//            jsonObject.put("action", action);
-//
-//            try {
-//                JSONObject jsonData = new JSONObject();
-//                for (Map.Entry<String, String> entry : data.entrySet()) {
-//                    jsonData.put(entry.getKey(), entry.getValue());
-//                }
-//                jsonObject.put("data", jsonData);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                jsonObject.put("data", "{}");
-//            }
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//
-//        return jsonObject.toString();
-//    }
-
-//    public RouterRequest json(String requestJsonString) {
-//        //Here remove Gson to save about 10ms.
-//        //RouterRequest routerRequest = new Gson().fromJson(requestJsonString, RouterRequest.class);
-//        try {
-//            JSONObject jsonObject = new JSONObject(requestJsonString);
-//            this.from = jsonObject.getString("from");
-//            this.domain = jsonObject.getString("domain");
-//            this.provider = jsonObject.getString("provider");
-//            this.action = jsonObject.getString("action");
-//            try {
-//                JSONObject jsonData = new JSONObject(jsonObject.getString("data"));
-//                Iterator it = jsonData.keys();
-//                while (it.hasNext()) {
-//                    String key = String.valueOf(it.next());
-//                    String value = (String) jsonData.get(key);
-//                    this.data.put(key, value);
-//                }
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                this.data = new HashMap<>();
-//            }
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//        return this;
-//    }
-
-    public RouterRequest url(String url) {
-        int questIndex = url.indexOf('?');
-        String[] urls = url.split("\\?");
-        if (urls.length != 1 && urls.length != 2) {
-            Logger.e(TAG, "The url is illegal.");
-            return this;
-        }
-        String[] targets = urls[0].split("/");
-        if (targets.length == 3) {
-            this.domain = targets[0];
-            this.provider = targets[1];
-            this.action = targets[2];
-        } else {
-            Logger.e(TAG, "The url is illegal.");
-            return this;
-        }
-        //Add params
-        if (questIndex != -1) {
-            String queryString = urls[1];
-            if (queryString != null && queryString.length() > 0) {
-                int ampersandIndex, lastAmpersandIndex = 0;
-                String subStr, key, value;
-                String[] paramPair, values, newValues;
-                do {
-                    ampersandIndex = queryString.indexOf('&', lastAmpersandIndex) + 1;
-                    if (ampersandIndex > 0) {
-                        subStr = queryString.substring(lastAmpersandIndex, ampersandIndex - 1);
-                        lastAmpersandIndex = ampersandIndex;
-                    } else {
-                        subStr = queryString.substring(lastAmpersandIndex);
-                    }
-                    paramPair = subStr.split("=");
-                    key = paramPair[0];
-                    value = paramPair.length == 1 ? "" : paramPair[1];
-                    try {
-                        value = URLDecoder.decode(value, "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                    data.putString(key, value);
-                } while (ampersandIndex > 0);
-            }
-        }
-        return this;
-    }
-
     public RouterRequest domain(String domain) {
         this.domain = domain;
         return this;
@@ -232,7 +131,7 @@ public class RouterRequest {
             }
         }
 
-        int num = index & (length - 1);
+        int num = index % (length - 1);
 
         RouterRequest target = table[num];
 
@@ -268,33 +167,6 @@ public class RouterRequest {
             mAction = "";
             mData = new Bundle();
         }
-
-//        public Builder json(String requestJsonString) {
-//            //Here remove Gson to save about 10ms.
-//            //RouterRequest routerRequest = new Gson().fromJson(requestJsonString, RouterRequest.class);
-//            try {
-//                JSONObject jsonObject = new JSONObject(requestJsonString);
-//                this.mFrom = jsonObject.getString("from");
-//                this.mDomain = jsonObject.getString("domain");
-//                this.mProvider = jsonObject.getString("provider");
-//                this.mAction = jsonObject.getString("action");
-//                try {
-//                    JSONObject jsonData = new JSONObject(jsonObject.getString("data"));
-//                    Iterator it = jsonData.keys();
-//                    while (it.hasNext()) {
-//                        String key = String.valueOf(it.next());
-//                        String value = (String) jsonData.get(key);
-//                        this.mData.put(key, value);
-//                    }
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                    this.mData = new HashMap<>();
-//                }
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//            return this;
-//        }
 
         public Builder url(String url) {
             int questIndex = url.indexOf('?');

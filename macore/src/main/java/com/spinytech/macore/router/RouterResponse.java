@@ -45,19 +45,6 @@ public class RouterResponse {
         return msg;
     }
 
-//    @Override
-//    public String toString() {
-//        JSONObject jsonObject = new JSONObject();
-//        try {
-//            jsonObject.put("code", code);
-//            jsonObject.put("msg", msg);
-//            jsonObject.put("data", data);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//        return jsonObject.toString();
-//    }
-
     public static class Builder {
         private int mCode;
         private String mMsg;
@@ -68,18 +55,6 @@ public class RouterResponse {
             mMsg = "";
             mData = null;
         }
-
-//        public Builder resultString(String resultString) {
-//            try {
-//                JSONObject jsonObject = new JSONObject(resultString);
-//                this.mCode = jsonObject.getInt("code");
-//                this.mMsg = jsonObject.getString("msg");
-//                this.mData = jsonObject.getString("data");
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//            return this;
-//        }
 
         public Builder code(int code) {
             this.mCode = code;
@@ -100,6 +75,4 @@ public class RouterResponse {
             return new RouterResponse(this);
         }
     }
-
-
 }

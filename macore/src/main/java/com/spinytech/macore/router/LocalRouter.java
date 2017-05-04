@@ -27,12 +27,12 @@ public class LocalRouter {
     private String mProcessName = ProcessUtil.UNKNOWN_PROCESS_NAME;
     private static LocalRouter sInstance = null;
     private HashMap<String, MaProvider> mProviders = null;
-    private MaApplication mApplication;
+    //private MaApplication mApplication;
     private static ExecutorService threadPool = null;
 
 
     private LocalRouter(MaApplication context) {
-        mApplication = context;
+        //mApplication = context;
         mProcessName = ProcessUtil.getProcessName(context, ProcessUtil.getMyProcessId());
         mProviders = new HashMap<>();
     }
@@ -61,7 +61,6 @@ public class LocalRouter {
 
     public void route(Context context, @NonNull RouterRequest routerRequest, ResponseCallback callback){
         Logger.d(TAG, "Process:" + mProcessName + "\nLocal route start: " + System.currentTimeMillis());
-        //RouterResponse routerResponse = new RouterResponse();
         // Local request
         if (mProcessName.equals(routerRequest.getDomain())) {
             Bundle params = new Bundle();
@@ -86,15 +85,7 @@ public class LocalRouter {
                 }
                 targetAction.invoke(context, params, callback);
             }
-            //RouterResponse result = attachment == null ? targetAction.invoke(context, params) : targetAction.invoke(context, params, attachment);
-            //routerResponse.mResultString = result.toString();
-            //routerResponse.mObject = result.getObject();
             Logger.d(TAG, "Process:" + mProcessName + "\nLocal sync end: " + System.currentTimeMillis());
-//            // Async result, use the thread pool to execute the task.
-//            else {
-//                LocalTask task = new LocalTask(routerResponse, params,attachment, context, targetAction);
-//                routerResponse.mAsyncResponse = getThreadPool().submit(task);
-//            }
         }
     }
 
@@ -117,7 +108,6 @@ public class LocalRouter {
         private Bundle mRequestData;
         private Context mContext;
         private MaAction mAction;
-        private ResponseCallback callback;
         private ResponseCallback innnerCallback;
         private Handler handler;
 
@@ -125,7 +115,6 @@ public class LocalRouter {
             this.mContext = context;
             this.mRequestData = requestData;
             this.mAction = maAction;
-            this.callback = callback;
             handler = new Handler(Looper.myLooper());
 
             innnerCallback = new ResponseCallback() {

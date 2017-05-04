@@ -33,7 +33,6 @@ public abstract class MaApplication extends Application {
         sInstance = this;
         Logger.d(TAG,"Application onCreate start: "+System.currentTimeMillis());
         init();
-        //startWideRouter();
         initializeLogic();
         dispatchLogic();
         instantiateLogic();
