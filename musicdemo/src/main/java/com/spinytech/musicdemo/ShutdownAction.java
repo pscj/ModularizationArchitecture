@@ -30,19 +30,6 @@ public class ShutdownAction extends MaAction {
                 .build();
         context.getApplicationContext().stopService(new Intent(context,MusicService.class));
 
-        //boolean stopslef =LocalRouter.getInstance(MaApplication.getMaApplication()).stopSelf(MusicRouterConnectService.class);
-        //Log.e("stopslef",""+stopslef);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                System.exit(0);
-            }
-        }).start();
         callback.onInvoke(requestData, result);
     }
 }

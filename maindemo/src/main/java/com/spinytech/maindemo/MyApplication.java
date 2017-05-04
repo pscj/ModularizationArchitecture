@@ -10,23 +10,15 @@ import com.spinytech.webdemo.WebApplicationLogic;
  */
 
 public class MyApplication extends MaApplication {
-    //@Override
-//    public void initializeAllProcessRouter() {
-//        WideRouter.registerLocalRouter("com.spinytech.maindemo",MainRouterConnectService.class);
-//        WideRouter.registerLocalRouter("com.spinytech.maindemo:music",MusicRouterConnectService.class);
-//        WideRouter.registerLocalRouter("com.spinytech.maindemo:pic",PicRouterConnectService.class);
-//    }
+
 
     @Override
     protected void initializeLogic() {
-        registerApplicationLogic("com.spinytech.maindemo",999, MainApplicationLogic.class);
-        registerApplicationLogic("com.spinytech.maindemo",998, WebApplicationLogic.class);
-        registerApplicationLogic("com.spinytech.maindemo:music",999, MusicApplicationLogic.class);
-        registerApplicationLogic("com.spinytech.maindemo",999, PicApplicationLogic.class);
+        registerApplicationLogic(getPackageName(),999, MainApplicationLogic.class);
+        registerApplicationLogic(getPackageName(),998, WebApplicationLogic.class);
+        registerApplicationLogic(getPackageName(),999, MusicApplicationLogic.class);
+        registerApplicationLogic(getPackageName(),999, PicApplicationLogic.class);
     }
 
-//    @Override
-//    public boolean needMultipleProcess() {
-//        return false;
-//    }
+
 }
